@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item1" object-name="workflow:name=generic" id="8c02abee-3d2a-4eda-a2f2-8ce2c4a98b4f" editor-version="2.0" version="0.0.1" api-version="6.0.0" allowed-operations="vfe" restartMode="1" resumeFromFailedMode="0">
+    <display-name>Set hostname</display-name>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="inputProperties" type="Properties"/>
+    </input>
+    <output>
+        <param name="resourceNames" type="Array/string"/>
+        <param name="customProperties" type="Properties"/>
+        <param name="imageRef" type="string"/>
+    </output>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="50.0" x="320.0"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item0" throw-bind-name="" type="task" comparator="0">
+        <display-name>Scriptable task</display-name>
+        <script encoded="false">System.log(JSON.stringify(inputProperties));
+
+customProperties = inputProperties.get("customProperties") || new Properties();
+
+resourceNames = inputProperties.get("resourceNames");
+
+for (idx = 0; idx &lt; resourceNames.length; idx++) {
+
+    var rNum = Math.floor(10000 + Math.random() * 90000);
+
+    resourceNames[idx] = "gphost-" + rNum;
+
+    customProperties.put("vmHostname-" + idx,resourceNames[idx]);
+
+}
+
+// System.log("Workload: " + payload.machine.properties.get("DTCC.workload"));
+
+System.log("Workload: " + inputProperties.customProperties.get("DTCC.workload"));
+
+System.log("Environment: " + inputProperties.customProperties.get("DTCC.environment"));
+
+System.log("Storage Offering: " + inputProperties.customProperties.get("DTCC.StorageOffering"));
+
+System.log("DataCenter Location: " + inputProperties.customProperties.get("Vrm.DataCenter.Location"));
+
+System.log("AppDetail: " + inputProperties.customProperties.get("DTCC.AppDetail"));
+
+//customProperties.put("customizationSpec","CentOS7-2");
+
+//customProperties.put("imageRef","Windows2012R2");
+
+//imageRef = "Windows2012R2";</script>
+        <in-binding>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+        </in-binding>
+        <out-binding>
+            <bind name="resourceNames" type="Array/string" export-name="resourceNames"/>
+            <bind name="customProperties" type="Properties" export-name="customProperties"/>
+            <bind name="imageRef" type="string" export-name="imageRef"/>
+        </out-binding>
+        <description>Simple task with custom script capability.</description>
+        <position y="60.0" x="180.0"/>
+    </workflow-item>
+</ns2:workflow>

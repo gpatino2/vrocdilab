@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item1" object-name="workflow:name=generic" id="1d1e2280-4858-4b53-aba3-85663ee809a8" version="0.0.0" api-version="6.0.0" allowed-operations="vfe" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Get bearer token]]></display-name>
+  <position y="50.0" x="100.0"/>
+  <output>
+    <param name="bearerToken" type="string"/>
+  </output>
+  <attrib name="userName" type="string" read-only="false">
+    <value encoded="n"><![CDATA[vmware]]></value>
+  </attrib>
+  <attrib name="pwd" type="SecureString" read-only="false">
+    <value encoded="n"><![CDATA[13BS4DV6FU6EV74X65W6CW65V6FR6EH65Z30X31O24WFF05DA6U76F986BO1ACE933Z5470CC9H991FBA6G298F69CI969091DH59A1D05OACEAA4EMC3EAFE0H73C6661SE18B80AID5F3567S9640452Y675309ALA4E2A5FZ296F9B7M59366CDG708B6AEO]]></value>
+  </attrib>
+  <attrib name="cspRestHost" type="REST:RESTHost" read-only="false">
+    <value encoded="n"><![CDATA[dunes://service.dunes.ch/CustomSDKObject?id='fad31d73-bc3b-4b64-aca8-ff1f8abfeed6'&dunesName='REST:RESTHost']]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="300.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item0" type="task">
+    <display-name><![CDATA[Get token]]></display-name>
+    <script encoded="false"><![CDATA[try
+{
+    var url = "/csp/gateway/am/api/login?access_token";
+    var requestContent = '{ "username": "' + userName + '", "password": "' + pwd + '"}';
+    var request = cspRestHost.createRequest("POST", url, requestContent);
+    
+    request.setHeader("Content-Type", "application/json");
+    request.setHeader("Cache-Control", "no-cache");
+    
+    var requestResponse = request.execute();
+
+    if(requestResponse.statusCode != 200)
+    {
+        System.log("Bearer token request has returned an error status code: " + requestResponse.statusCode);
+        throw "Error: " + requestResponse.statusCode;
+    }
+    
+    bearerToken = JSON.parse(requestResponse.contentAsString).access_token;
+    System.log("Bearer Token: " + bearerToken);
+
+}
+catch(e)
+{
+    System.log(e);
+    throw e;
+}]]></script>
+    <in-binding>
+      <bind name="userName" type="string" export-name="userName"/>
+      <bind name="pwd" type="SecureString" export-name="pwd"/>
+      <bind name="cspRestHost" type="REST:RESTHost" export-name="cspRestHost"/>
+    </in-binding>
+    <out-binding>
+      <bind name="bearerToken" type="string" export-name="bearerToken"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="160.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

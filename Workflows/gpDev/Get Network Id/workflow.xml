@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item3" object-name="workflow:name=generic" id="ae7a111d-050e-4c49-9ac8-a3a34282ba39" version="0.0.1" api-version="6.0.0" allowed-operations="evf" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Get Network Id]]></display-name>
+  <position y="50.0" x="80.0"/>
+  <input>
+    <param name="networkName" type="string"/>
+  </input>
+  <output>
+    <param name="networkId" type="string">
+      <description><![CDATA[Network Id for specified network]]></description>
+    </param>
+  </output>
+  <attrib name="restHost" type="REST:RESTHost" read-only="false" conf-id="cf442bf5-3fad-482d-a583-a9b9bc088134" conf-key="restHost"/>
+  <attrib name="operation" type="string" read-only="false">
+    <value encoded="n"><![CDATA[GET]]></value>
+  </attrib>
+  <attrib name="url" type="string" read-only="false">
+    <value encoded="n"><![CDATA[/iaas/api/fabric-networks/]]></value>
+  </attrib>
+  <attrib name="content" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="username" type="string" read-only="false" conf-id="cf442bf5-3fad-482d-a583-a9b9bc088134" conf-key="username">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <attrib name="password" type="SecureString" read-only="false" conf-id="cf442bf5-3fad-482d-a583-a9b9bc088134" conf-key="password"/>
+  <attrib name="parameters" type="Array/string" read-only="false">
+    <value encoded="n"><![CDATA[[]]]></value>
+  </attrib>
+  <attrib name="contentAsString" type="string" read-only="false">
+    <value encoded="n"><![CDATA[]]></value>
+  </attrib>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="440.0"/>
+  </workflow-item>
+  <workflow-item name="item2" out-name="item0" type="task">
+    <display-name><![CDATA[Get details]]></display-name>
+    <script encoded="false"><![CDATA[var netId = null;
+
+var netPayload = JSON.parse(contentAsString);
+
+for (i=0; i < netPayload.content.length; i++) {
+
+    if (netPayload.content[i].name.toLowerCase() == networkName.toLowerCase()) {
+        System.log ("Network Id found: " + netPayload.content[i].id);
+        netId = netPayload.content[i].id;
+        break;
+    }
+}
+
+if (netId == null) {
+    throw ("Error: No network ID found for network: " + networkName);
+} else {
+    networkId = netId;    
+}]]></script>
+    <in-binding>
+      <bind name="networkName" type="string" export-name="networkName"/>
+      <bind name="contentAsString" type="string" export-name="contentAsString"/>
+    </in-binding>
+    <out-binding>
+      <bind name="networkId" type="string" export-name="networkId"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="281.0"/>
+  </workflow-item>
+  <workflow-item name="item3" out-name="item2" type="link" linked-workflow-id="2de7fa9b-dc0f-4a0f-86c4-85a0cce4b8e2">
+    <display-name><![CDATA[Invoke VRA 8 REST Operation from URL]]></display-name>
+    <in-binding>
+      <bind name="restHost" type="REST:RESTHost" export-name="restHost"/>
+      <bind name="operation" type="string" export-name="operation"/>
+      <bind name="url" type="string" export-name="url"/>
+      <bind name="content" type="string" export-name="content"/>
+      <bind name="username" type="string" export-name="username"/>
+      <bind name="password" type="SecureString" export-name="password"/>
+      <bind name="parameters" type="Array/string" export-name="parameters"/>
+    </in-binding>
+    <out-binding>
+      <bind name="contentAsString" type="string" export-name="contentAsString"/>
+    </out-binding>
+    <description><![CDATA[ ]]></description>
+    <position y="60.0" x="160.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>

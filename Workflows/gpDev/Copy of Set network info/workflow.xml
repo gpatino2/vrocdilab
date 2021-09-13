@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item1" object-name="workflow:name=generic" id="46dbfbcc-83ef-4354-9bde-c7f8ba4ce8a8" version="0.0.2" api-version="6.0.0" allowed-operations="evf" editor-version="2.0" restartMode="1" resumeFromFailedMode="0">
+  <display-name><![CDATA[Copy of Set network info]]></display-name>
+  <position y="50.0" x="80.0"/>
+  <input>
+    <param name="inputProperties" type="Properties"/>
+  </input>
+  <output>
+    <param name="addresses" type="Any"/>
+    <param name="networkSelectionIds" type="Any"/>
+    <param name="gateways" type="Any"/>
+    <param name="dnsServers" type="Any"/>
+    <param name="cidrs" type="Any"/>
+    <param name="domains" type="Any"/>
+  </output>
+  <workflow-item name="item0" type="end" end-mode="0">
+    <in-binding/>
+    <position y="50.0" x="320.0"/>
+  </workflow-item>
+  <workflow-item name="item1" out-name="item0" type="task">
+    <display-name><![CDATA[Scriptable task]]></display-name>
+    <script encoded="false"><![CDATA[System.log(JSON.stringify(inputProperties));
+
+cidrs = new Array();
+
+cidrs.push(["172.30.100.0/24"]);
+
+//cidrs.push(["172.30.55.0/24"],["172.30.56.0/24"]);
+
+domains = new Array();
+
+domains.push(["cdi.demo"]);
+
+//domains.push(["cdi.demo"],["cdi.backup.demo"]);
+
+addresses = new Array();
+
+addresses.push(["172.30.100.160"]);
+
+//addresses.push(["172.30.55.220"]);
+
+//addresses.push(["172.30.55.221"],["172.30.55.221"]);
+
+networkSelectionIds = new Array();
+
+networkSelectionIds.push([["bfd9d03d-c9bc-4bbc-b463-1a48972121ff"]]);
+
+//networkSelectionIds.push([["2bf7137a-3199-413e-ba38-8874711f38e7"],["2bf7137a-3199-413e-ba38-8874711f38e7"]]);
+
+//networkSelectionIds.push([["2bf7137a-3199-413e-ba38-8874711f38e7"]]);
+
+gateways = new Array();
+
+//gateways.push([["172.30.55.254"]]);
+
+gateways.push([["172.30.100.254"]]);
+
+//gateways.push([["172.30.55.254"],["172.30.56.254"]]);
+
+dnsServers = new Array();
+
+dnsServers.push([["172.30.97.20","172.30.97.21"]]);
+
+//dnsServers.push([["172.30.97.20","172.30.97.21"],["172.30.97.20","172.30.97.21"]]);
+]]></script>
+    <in-binding>
+      <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+    </in-binding>
+    <out-binding>
+      <bind name="addresses" type="Any" export-name="addresses"/>
+      <bind name="networkSelectionIds" type="Any" export-name="networkSelectionIds"/>
+      <bind name="gateways" type="Any" export-name="gateways"/>
+      <bind name="dnsServers" type="Any" export-name="dnsServers"/>
+      <bind name="cidrs" type="Any" export-name="cidrs"/>
+      <bind name="domains" type="Any" export-name="domains"/>
+    </out-binding>
+    <description><![CDATA[Simple task with custom script capability.]]></description>
+    <position y="60.0" x="160.0"/>
+  </workflow-item>
+  <presentation/>
+</workflow>
