@@ -1,0 +1,1 @@
+{"layout":{"pages":[{"id":"page_1","title":"General","sections":[{"id":"section_0","fields":[{"id":"WorkFlowFolder","display":"textField"}]}]}]},"schema":{"WorkFlowFolder":{"type":{"dataType":"string","isMultiple":false},"label":"WorkFlowFolder","id":"WorkFlowFolder","constraints":{}}},"itemId":""}
