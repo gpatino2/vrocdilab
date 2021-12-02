@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow xmlns:ns2="http://vmware.com/vco/workflow" root-name="item7" object-name="workflow:name=generic" id="c7035fc2-df16-4f87-ace8-2aecab47d455" icon-id="eb223878-43b8-4af3-9baa-8f57e168d31f" editor-version="2.0" version="0.0.3" api-version="6.0.0" allowed-operations="evf" restartMode="1" resumeFromFailedMode="0">
+    <display-name>ets_Enable UUID Config</display-name>
+    <error-handler name="item6">
+        <position y="136.3181818181818" x="105.0"/>
+    </error-handler>
+    <position y="50.0" x="100.0"/>
+    <input>
+        <param name="inputProperties" type="Properties"/>
+    </input>
+    <output/>
+    <attrib name="hostname" type="string">
+        <value encoded="n"></value>
+        <description>VM name</description>
+    </attrib>
+    <attrib name="vmOut" type="VC:VirtualMachine">
+        <value encoded="n"/>
+        <description>Found vCenter VM object</description>
+    </attrib>
+    <attrib name="vmTask" type="VC:Task">
+        <value encoded="n"/>
+        <description>VM task object</description>
+    </attrib>
+    <attrib name="progress" type="boolean">
+        <value encoded="n">false</value>
+        <description>Log progess while waiting for the task</description>
+    </attrib>
+    <attrib name="pollRate" type="number">
+        <value encoded="n">1.0</value>
+        <description>Polling rate for the task state [seconds]</description>
+    </attrib>
+    <attrib name="taskResult" type="Any">
+        <value encoded="n"/>
+        <description>Task result</description>
+    </attrib>
+    <attrib name="errorCode" type="string">
+        <value encoded="n"></value>
+        <description>Error  binding attribute</description>
+    </attrib>
+    <workflow-item name="item0" type="end" end-mode="0" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="45.40909090909091" x="1084.5"/>
+    </workflow-item>
+    <workflow-item name="item1" out-name="item9" throw-bind-name="errorCode" type="task" comparator="0">
+        <display-name>Parse payload</display-name>
+        <script encoded="false">System.log(JSON.stringify(inputProperties));
+
+var resourceNames = inputProperties.get("resourceNames");
+
+hostname = resourceNames[0];
+
+System.log("Configuring VM: " + hostname);
+</script>
+        <in-binding>
+            <bind name="inputProperties" type="Properties" export-name="inputProperties"/>
+        </in-binding>
+        <out-binding>
+            <bind name="hostname" type="string" export-name="hostname"/>
+        </out-binding>
+        <position y="55.40909090909091" x="344.5"/>
+    </workflow-item>
+    <workflow-item name="item3" out-name="item4" throw-bind-name="errorCode" type="task" comparator="0">
+        <display-name>Change VM setting</display-name>
+        <script encoded="false">var changedValue = new Array()
+
+// Configure array value
+changedValue[0] = new VcOptionValue();
+changedValue[0].key = "disk.EnableUUID";
+changedValue[0].value = "true";
+
+// Create config spec object and assign array value
+var ConfigSpec = new VcVirtualMachineConfigSpec();
+ConfigSpec.extraConfig = changedValue;
+
+// Reconfigure VM and assign task to attribute
+vmTask = vm.reconfigVM_Task(ConfigSpec);
+
+</script>
+        <in-binding>
+            <bind name="vm" type="VC:VirtualMachine" export-name="vmOut"/>
+        </in-binding>
+        <out-binding>
+            <bind name="vmTask" type="VC:Task" export-name="vmTask"/>
+        </out-binding>
+        <position y="55.40909090909091" x="624.5"/>
+    </workflow-item>
+    <workflow-item name="item4" out-name="item8" type="task" script-module="com.vmware.library.vc.basic/vim3WaitTaskEnd" comparator="0">
+        <display-name>vim3WaitTaskEnd</display-name>
+        <script encoded="false">//Auto generated script, cannot be modified !
+actionResult = System.getModule("com.vmware.library.vc.basic").vim3WaitTaskEnd(task,progress,pollRate) ;</script>
+        <in-binding>
+            <bind name="task" type="VC:Task" export-name="vmTask">
+                <description>Task to Wait for</description>
+            </bind>
+            <bind name="progress" type="boolean" export-name="progress">
+                <description>Log progess while waiting for the task</description>
+            </bind>
+            <bind name="pollRate" type="number" export-name="pollRate">
+                <description>Polling rate for the task state [seconds]</description>
+            </bind>
+        </in-binding>
+        <out-binding>
+            <bind name="actionResult" type="Any" export-name="taskResult"/>
+        </out-binding>
+        <description>Wait for a VC Task to end.
+When task ended, return the task result if any. </description>
+        <position y="55.40909090909091" x="764.5"/>
+    </workflow-item>
+    <workflow-item name="item5" throw-bind-name="errorCode" type="end" end-mode="1" comparator="0">
+        <in-binding/>
+        <out-binding/>
+        <position y="136.3181818181818" x="384.5"/>
+    </workflow-item>
+    <workflow-item name="item6" out-name="item5" type="task" prototype-id="system-log" interaction="l" comparator="0">
+        <display-name>System log</display-name>
+        <script encoded="false">//Auto-generated script
+System.log("Encountered error: " + text);
+</script>
+        <in-binding>
+            <bind name="text" type="string" export-name="errorCode">
+                <description>The text to log</description>
+            </bind>
+        </in-binding>
+        <out-binding/>
+        <description>Log the input text to the console log with level 'log'</description>
+        <position y="146.3181818181818" x="204.5"/>
+    </workflow-item>
+    <workflow-item name="item7" out-name="item1" type="task" prototype-id="system-log" interaction="l" comparator="0">
+        <display-name>Log Entry</display-name>
+        <script encoded="false">System.log("================= EBS Workflow Entry: ebs_EnableUuidConfig ================= ");
+</script>
+        <in-binding/>
+        <out-binding/>
+        <description>Log the input text to the console log with level 'log'</description>
+        <position y="55.40909090909091" x="204.5"/>
+    </workflow-item>
+    <workflow-item name="item8" out-name="item0" type="task" prototype-id="system-log" interaction="l" comparator="0">
+        <display-name>Log Exit</display-name>
+        <script encoded="false">System.log("================= EBS Workflow Exit: ebs_EnableUuidConfig ================= ");
+</script>
+        <in-binding/>
+        <out-binding/>
+        <description>Log the input text to the console log with level 'log'</description>
+        <position y="55.40909090909091" x="904.5"/>
+    </workflow-item>
+    <workflow-item name="item9" out-name="item3" type="link" linked-workflow-id="ff8517e9-851c-445e-a784-04588fbd3c0b" comparator="0">
+        <display-name>Find VC VM 2</display-name>
+        <in-binding>
+            <bind name="vmName" type="string" export-name="hostname"/>
+        </in-binding>
+        <out-binding>
+            <bind name="vmOut" type="VC:VirtualMachine" export-name="vmOut">
+                <description>Virtual machines found</description>
+            </bind>
+        </out-binding>
+        <description>Returns a list of virtual machines from all registered vCenter Server hosts that match the provided expression.</description>
+        <position y="55.40909090909091" x="484.5"/>
+    </workflow-item>
+    <workflow-note x="80.0" y="136.36363636363635" w="360.0" h="45.45454545454545" color="d7a1a1ff">
+        <description>Log error</description>
+    </workflow-note>
+</ns2:workflow>
